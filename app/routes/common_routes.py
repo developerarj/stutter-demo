@@ -13,6 +13,7 @@ from utils.openAi.generate_feedback import generate_feedback
 from utils.openAi.generate_improvement_tips import generate_improvement_tips
 from utils.openAi.generate_practice_dialogue import generate_practice_dialogue
 from utils.openAi.generate_progress_report import generate_progress_report
+from utils.openAi.generate_q_a import generate_q_a
 import shutil
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -1078,3 +1079,26 @@ def initialize_common_routes(mongo):
             new_dialogue['activityTheme'] = existing_activityTheme
 
             return jsonify(new_dialogue), 200
+        
+
+#---------------------------- Generate Questions ----------------------#
+
+    @common_bp.route('/common/utterance/generateQuestions/<theme_id>', methods=['GET'])
+    @jwt_required()
+    def generateSpeechQuestion(theme_id):
+        
+        try:
+            obj_id = ObjectId(theme_id)
+            theme_doc = mongo.db.activityTheme.find_one({'_id': obj_id})
+            
+            if theme_doc:
+                theme_name = theme_doc.get('theme')            
+                result = generate_q_a(theme_doc)
+                return jsonify({'Theme': theme_name, 'result': result}), 200
+            else:
+                return jsonify({"error": "Theme not found"}), 404
+            
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    

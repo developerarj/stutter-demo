@@ -19,5 +19,5 @@ def generate_practice_dialogue(topic, user, friend_name):
     )
 
     response_message = completion.choices[0].message.content
-
+    
     return response_message
